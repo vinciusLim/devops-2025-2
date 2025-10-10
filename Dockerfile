@@ -9,7 +9,7 @@ COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn ./.yarn
 
 # Install dependencies
-RUN yarn 
+RUN corepack enable && yarn  
 
 # Copy the rest of the application code
 COPY . .
