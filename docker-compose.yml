@@ -1,0 +1,47 @@
+# Versão do Docker Compose
+version: '3.8'
+
+# Definir os serviços
+services:
+  # Serviço da API
+  api:
+    build: .
+    # Nome para o container
+    container_name: api_nest
+    # Mapear a porta 3000 do container para a porta 3000 do host
+    ports:
+      - '3000:3000'
+    # Definir variáveis de ambiente
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}?schema=public
+    # Conectar a rede personalizada
+    networks:
+      - api-network
+    depends_on:
+      db: 
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Serviço do banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    # Container name
+    container_name: postgres_db
+    # Variaveis de ambiente
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    # Mapear a porta 5432 do container para a porta 35432 do host
+    ports:
+      - '35432:5432'
+    # Volumente para persistência de dados
+    volumes:
+     - postges_data:/var/lib/postgresql/data
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
