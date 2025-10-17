@@ -37,7 +37,7 @@ services:
       - '35432:5432'
     # Volumente para persistência de dados
     volumes:
-     - postges_data:/var/lib/postgresql/data
+     - postgres_data:/var/lib/postgresql/data
     networks:
       - api-network
     healthcheck:
@@ -45,3 +45,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+#Definir rede
+networks:
+  api-network:
+    driver: bridge
+# Definir volumes
+volumes:
+  postgres_data:

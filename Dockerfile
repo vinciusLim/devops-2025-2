@@ -15,6 +15,7 @@ RUN corepack enable && yarn
 COPY . .
 
 # Build the application
+RUN yarn prisma generate
 RUN yarn build
 RUN yarn workspaces focus --production && yarn cache clean
 
@@ -29,9 +30,10 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/package.json ./package.json
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/prisma ./prisma
 
 # Expose the application port
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:prod:migrate"]
